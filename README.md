@@ -1,6 +1,19 @@
 # ovmf-prebuilt
 
-Downloads and extracts the prebuilt [OVMF](https://github.com/tianocore/tianocore.github.io/wiki/OVMF) binaries from [Gerd Hoffman's RPM builds](https://www.kraxel.org/repos/) and provides them as GitHub releases.
+Builds a release tag of [edk2](https://github.com/tianocore/edk2) and uploads it as a Github release to this repo.
+
+The contents of the release tarball look like this:
+```
+x64/shell.efi
+x64/vars.fd
+x64/code.fd
+ia32/shell.efi
+ia32/vars.fd
+ia32/code.fd
+aarch64/vars.fd
+aarch64/code.fd
+aarch64/shell.efi
+```
 
 [**Latest Release**](https://github.com/rust-osdev/ovmf-prebuilt/releases/latest)
 
