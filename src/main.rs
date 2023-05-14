@@ -1,5 +1,5 @@
 use anyhow::{anyhow, bail, Result};
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::process::Command;
 use std::{env, fs};
 
@@ -23,7 +23,7 @@ impl Release {
             bail!("bad edk2 git tag");
         }
         let release_number = parts[0]
-            .strip_prefix("r")
+            .strip_prefix('r')
             .ok_or(anyhow!("bad release number"))?;
         Ok(Self {
             prebuilt_git_tag: tag.to_string(),
@@ -58,24 +58,13 @@ impl Release {
     }
 }
 
-/// Get the base command for building containers. Use podman if
-/// available, otherwise use "sudo docker".
-fn get_container_cmd() -> Command {
-    let podman = Path::new("/usr/bin/podman");
-    if podman.exists() {
-        Command::new(podman)
-    } else {
-        let mut cmd = Command::new("sudo");
-        cmd.arg("docker");
-        cmd
-    }
-}
-
 fn build_tarball(release: &Release) -> Result<PathBuf> {
+    let container_cmd = env::var("CONTAINER_CMD").unwrap_or("podman".to_string());
+
     let container_tag = "ovmf_prebuilt";
 
     // Build everything.
-    let mut cmd = get_container_cmd();
+    let mut cmd = Command::new(&container_cmd);
     cmd.args([
         "build",
         "-t",
@@ -94,7 +83,7 @@ fn build_tarball(release: &Release) -> Result<PathBuf> {
 
     // Copy out the tarball from the image.
     let tarball_name = release.tarball_name();
-    let mut cmd = get_container_cmd();
+    let mut cmd = Command::new(&container_cmd);
     cmd.args(["run", container_tag, "cat", &tarball_name]);
     println!("run: {cmd:?}");
     let output = cmd.output()?;
